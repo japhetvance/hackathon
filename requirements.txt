@@ -3,3 +3,4 @@ requests
 streamlit
 Pillow
 requests
+python-dotenv
