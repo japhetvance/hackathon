@@ -9,12 +9,26 @@ import os
 import base64
 import io
 import requests
-
 load_dotenv()
+
+st.set_page_config(layout='wide')
 
 client = openai.OpenAI(
     api_key=os.getenv("OPENAI_API_KEY"),
 )
+
+if 'show_eligibility_checker' not in st.session_state:
+    st.session_state.show_eligibility_checker = False
+
+if "show_eligibility_result" not in st.session_state:
+    st.session_state.show_eligibility_result = False
+
+if "show_loan_application_form" not in st.session_state:
+    st.session_state.show_loan_application_form = False
+
+if "show_loan_application_results" not in st.session_state:
+    st.session_state.show_loan_application_results = False
+
 
 # Fetch data from APi
 @st.cache_data(show_spinner=False)
@@ -169,19 +183,16 @@ def eligibility_checker_form():
     fetch_data()
     provinces, cities = fetch_data()
 
+    if "show_form" not in st.session_state:
+        st.session_state.show_form = False
+
     provinces_names = ["--none selected--"] + sorted([province["name"] for province in provinces])
     cities_names = ["--none selected--"] + sorted([city["name"] for city in cities])
 
     with open('extracted_data.json', 'r') as json_file:
         data = json.load(json_file)
 
-    if 'show_input' not in st.session_state:
-        st.session_state.show_input = False
-
-    if "show_results" not in st.session_state:
-        st.session_state.show_results = False
-
-    if st.session_state.show_input:
+    if st.session_state.show_form:
         with st.form("eligibility_form"):
             st.write("Please fill in the form below to check your eligibility for a BPI Personal Loan.")
             col1, col2, col3 = st.columns(3)
@@ -257,15 +268,19 @@ def eligibility_checker_form():
                         "gross_monthly_income": gross_monthly_income,
                         "loan_timeline": loan_timeline
                     }
-                    st.session_state.show_input = False
-                    st.session_state.show_results = True
+                    st.session_state.show_form = False
+                    st.session_state.show_eligibility_result = True
                     st.rerun()
 
-    elif st.session_state.show_results:
+    elif st.session_state.show_eligibility_result:
         eligibility_results()
 
     else:
-        st.write("Through your expressed consent, you acknowledge and agree that your information may be processed and shared within BPI to communicate with you regarding marketing communications, programs, products and services of the Bank that you may find interesting and relevant. In compliance with the Data Privacy Act (R.A.10173), the personal data collected is treated with confidentiality and will only be retained solely for the fulfillment of the aforementioned purposes. To know more about how we process your personal data, please refer to BPI’s Privacy Policy.")
+        st.markdown("""Through your expressed consent, you acknowledge and agree that your information may be processed and shared within BPI to communicate with you regarding marketing communications, programs, products and services of the Bank that you may find interesting and relevant. 
+                    <br><br>
+                    In compliance with the Data Privacy Act (R.A.10173), the personal data collected is treated with confidentiality and will only be retained solely for the fulfillment of the aforementioned purposes. To know more about how we process your personal data, please refer to BPI’s Privacy Policy.""",
+                    unsafe_allow_html=True
+                    )
         consent = st.checkbox("I consent to the above")
         st.write("---")
         st.write("### Magic Fill-Out: Snap, Upload, and Watch Your Forms Fill Themselves!")
@@ -342,7 +357,7 @@ def eligibility_checker_form():
             if not consent:
                 st.error("Please consent to the above before proceeding.")
             else:
-                st.session_state.show_input = True
+                st.session_state.show_form = True
                 st.rerun()
 
 def eligibility_results():
@@ -358,14 +373,13 @@ def eligibility_results():
     </p>
     """, unsafe_allow_html=True)
 
-    # Start loan application button
-    st.markdown("""
-    <div style='text-align: center;'>
-        <button style='background-color: #FFFFFF; border: 1px solid #DCDCDC; padding: 10px 20px; font-size: 18px; cursor: pointer;'>
-            Start Loan Application
-        </button>
-    </div>
-    """, unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([3, 1, 3])
+    with col2:
+        if st.button("Start Loan Application", use_container_width=True):
+            st.session_state.show_eligibility_result = False
+            st.session_state.show_eligibility_checker = False
+            st.session_state.button_clicked = False
+            st.rerun()
 
     # Additional contact information
     st.markdown(
@@ -524,7 +538,8 @@ def loan_application_form():
             st.markdown("### **C. FINANCIAL INFORMATION**")
             st.markdown("---")
             source_of_repayment = st.radio("Source of Repayment", ["Revenue", "Asset Sale", "Savings and/or Investment", "Inheritance", "Salary/Allowance", "Others"], index=None)
-            st.markdown("Existing Deposit and E-money Account")
+            st.markdown("---")
+            st.markdown("**Existing Deposit and E-money Account**")
             col1, col2, col3, col4 = st.columns(4)
             with col1:
                 st.markdown("Name of Financial Institution")
@@ -544,49 +559,155 @@ def loan_application_form():
                 deposit_year_opened = st.text_input("Year Opened")
             with col4:
                 deposit_ownership = st.radio("Deposit Ownership", ["Personal", "Business/Merchant"], index=None)
+            st.markdown("---")
+            st.markdown("**Existing Loans**")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.markdown("Name of Financial Institution")
+            with col2:
+                st.markdown("Loan Amount")
+            with col3:
+                st.markdown("Date Granted")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                loan_name = st.text_input("Loan Name")
+            with col2:
+                existing_loan_amount = st.text_input("Existing Loan Amount")
+            with col3:
+                loan_date_granted = st.date_input("Date Granted", value=None)
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.markdown("Maturity Date")
+            with col2:
+                st.markdown("Outstanding Balance")
+            with col3:
+                st.markdown("Collateral/s Offered")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                loan_maturity_date = st.date_input("Maturity Date", value=None)
+            with col2:
+                outstanding_balance = st.text_input("Outstanding Balance")
+            with col3:
+                collateral_offered = st.text_input("Collateral Offered")
+            st.markdown("---")
+            st.markdown("**Existing Credit Cards**")
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.markdown("Name of Financial Institution")
+            with col2:
+                st.markdown("Credit Limit")
+            with col3:
+                st.markdown("Outstanding Balance")
+            with col4:
+                st.markdown("Type of Ownership")
 
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                credit_name = st.text_input("Credit Name")
+            with col2:
+                credit_limit = st.text_input("Credit Limit")
+            with col3:
+                credit_outstanding_balance = st.text_input("Card Outstanding Balance")
+            with col4:
+                credit_ownership = st.radio("Credit Ownership", ["Personal", "Business"], index=None)
 
+            submitted = st.form_submit_button("Submit")
+            if submitted:
+                st.session_state.show_application_form = False
+                st.session_state.show_loan_application_results = True
+                st.rerun()
 
+def loan_application_results(loan_type):
+    # Main content
+    st.markdown("<h2 style='text-align: center; color: black;'>Congratulations!</h2>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; font-size: 48px; color: #4CAF50;'>Your Loan Application is Successful</h1>",
+                unsafe_allow_html=True)
 
+    st.markdown(f"""
+        <p style='text-align: center; color: gray;'>
+            Thank you for applying to our <strong>{loan_type}</strong>. Your application has been successfully submitted.
+            <br>
+            Our team will review it, and you will receive an email with further instructions within the next few business days.
+        </p>
+        """, unsafe_allow_html=True)
 
+    col1, col2, col3 = st.columns([3, 1, 3])
+    with col2:
+        if st.button("Return Home", use_container_width=True):
+            st.session_state.show_loan_application_form = False
+            st.session_state.show_loan_application_results = False
+            st.session_state.button_clicked = False
+            st.rerun()
 
+    # Additional contact information
+    st.markdown(
+        "<h4 style='text-align: center; color: black; margin-top: 30px;'>For concerns and inquiries, please contact</h4>",
+        unsafe_allow_html=True)
 
+    # Customer support button
+    st.markdown("""
+        <div style='text-align: center;'>
+            <button style='background-color: #FFFFFF; border: 1px solid #DCDCDC; padding: 10px 20px; font-size: 18px; cursor: pointer;'>
+                Business Banking Customer Support
+            </button>
+        </div>
+        """, unsafe_allow_html=True)
+
+def homepage():
+
+    if "home" not in st.session_state:
+        st.session_state.home = True
+
+    if st.session_state.home:
+        st.markdown("<h1 style='text-align: center; color: black;'>Welcome to BPI Ka-Negosyo Loans</h1>", unsafe_allow_html=True)
+        st.markdown("""
+        <p style='text-align: center; color: gray;'>
+            We are here to help you grow your business. Whether you are looking to expand your operations, 
+            purchase new equipment, or simply need working capital, we have the right loan for you.
+        </p>
+        """, unsafe_allow_html=True)
+
+        st.markdown("""
+        <p style='text-align: center; color: gray;'>
+            To get started, please select an option below:
+        </p>
+        """, unsafe_allow_html=True)
+
+        st.markdown("---")
+
+        st.markdown("<h2 style='text-align: center; color: black;'>What would you like to do today?</h2>", unsafe_allow_html=True)
+
+        col1, col2, col3, col4 = st.columns(4)
+        with col2:
+            if st.button("Eligibility Checker", key="eligibility_checker", use_container_width=True):
+                st.session_state.show_eligibility_checker = True
+                st.session_state.show_loan_application_form = False
+                st.session_state.show_loan_application_results = False
+                st.session_state.home = False
+                st.rerun()
+
+        with col3:
+            if st.button("Loan Application Form", key="loan_application_form" , use_container_width=True):
+                st.session_state.show_eligibility_checker = False
+                st.session_state.show_loan_application_form = True
+                st.session_state.show_loan_application_results = False
+                st.session_state.home = False
+                st.rerun()
 
 def main():
+    homepage()
 
-    if "button_clicked" not in st.session_state:
-        st.session_state.button_clicked = False
-    if "show_form" not in st.session_state:
-        st.session_state.show_form = False
-    if "show_application" not in st.session_state:
-        st.session_state.show_application = False
-
-    if not st.session_state.button_clicked:
-        if st.button("Eligibility Checker"):
-            st.session_state.button_clicked = True
-            st.session_state.show_form = True
-            st.rerun()
-
-        if st.button("Apply for a Loan"):
-            st.session_state.button_clicked = True
-            st.session_state.show_application = True
-            st.write("Apply for a loan")
-            st.rerun()
-
-    if st.session_state.show_form:
+    if st.session_state.show_eligibility_checker:
         eligibility_checker_form()
 
-    if st.session_state.show_application:
+    if st.session_state.show_loan_application_form:
         loan_application_form()
 
-    # form_data = st.session_state.get("form_data", {})
-    #
-    # # Show results and return button if form is hidden
-    # if not st.session_state.show_form:
-    #     st.write("---")
-    #     st.subheader("Form Data:")
-    #     for key, value in form_data.items():
-    #         st.write(f"{key}: {value}")
+    if st.session_state.show_eligibility_result:
+        eligibility_results()
+
+    if st.session_state.show_loan_application_results:
+        loan_application_results("Ka-Negosyo Credit Line")
 
 if __name__ == "__main__":
     main()
