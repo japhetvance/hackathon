@@ -1,11 +1,6 @@
 from datetime import datetime
 import json
-import uuid
-from operator import index
-
 import openai
-from altair import value
-from conda_package_streaming.url import session
 from dotenv import load_dotenv
 from PIL import Image
 from io import BytesIO
