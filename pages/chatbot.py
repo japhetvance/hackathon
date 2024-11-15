@@ -24,7 +24,7 @@ load_dotenv()
 
 # Lazy download nltk data only if not already downloaded
 if "nltk_data" not in st.session_state:
-    nltk.download('punkt')
+    nltk.download('punkt_tab')
     st.session_state.nltk_data = True
 
 # Function to convert an image file to a base64 string
