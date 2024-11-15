@@ -34,8 +34,8 @@ def image_to_base64(image_path):
 
 
 # Paths to the avatar images on your computer (Replace with your actual paths)
-user_avatar_path = Path("../avatar/human.png")
-assistant_avatar_path = Path("../avatar/ai.png")
+user_avatar_path = "../avatar/human.png"
+assistant_avatar_path = "../avatar/ai.png"
 
 # Convert images to base64
 user_avatar_base64 = image_to_base64(user_avatar_path)
