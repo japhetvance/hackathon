@@ -179,6 +179,25 @@ def extract_raw_text_from_img_openai_all(image_bytes, document_type, has_middle_
     raw_text = response.choices[0].message.content
     return raw_text
 
+@st.dialog("❗Important Reminder",width="large")
+def dialog():
+    st.markdown("""Through your expressed consent, you acknowledge and agree that your information may be processed and shared within BPI to communicate with you regarding marketing communications, programs, products and services of the Bank that you may find interesting and relevant. 
+                        <br><br>
+                        In compliance with the Data Privacy Act (R.A.10173), the personal data collected is treated with confidentiality and will only be retained solely for the fulfillment of the aforementioned purposes. To know more about how we process your personal data, please refer to BPI’s Privacy Policy.""",
+                unsafe_allow_html=True
+                )
+    consent = st.checkbox("I consent to the above")
+    if st.button("Proceed"):
+        if consent:
+            st.session_state.show_eligibility_checker = True
+            st.session_state.show_loan_application_form = False
+            st.session_state.show_loan_application_results = False
+            st.session_state.home = False
+            st.rerun()
+        else:
+            st.error("Please provide your consent to proceed.")
+
+
 
 def eligibility_checker_form():
     fetch_data()
@@ -289,15 +308,16 @@ def eligibility_checker_form():
         eligibility_results()
 
     else:
-        st.markdown("""Through your expressed consent, you acknowledge and agree that your information may be processed and shared within BPI to communicate with you regarding marketing communications, programs, products and services of the Bank that you may find interesting and relevant. 
-                    <br><br>
-                    In compliance with the Data Privacy Act (R.A.10173), the personal data collected is treated with confidentiality and will only be retained solely for the fulfillment of the aforementioned purposes. To know more about how we process your personal data, please refer to BPI’s Privacy Policy.""",
-                    unsafe_allow_html=True
-                    )
-        consent = st.checkbox("I consent to the above")
-        st.write("---")
-        st.write("### Magic Fill-Out: Snap, Upload, and Watch Your Forms Fill Themselves!")
-        st.write("Say goodbye to tedious form filling! With Magic Fill-Out, simply upload a photo of your credentials, and let our smart tool do the rest. In seconds, all your information is seamlessly entered into the form fields, saving you time and hassle. It's like magic—just faster!")
+        st.markdown("<h1 style='text-align: center; color: #AC0D19;'>Magic Fill-Out</h1>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: center; color: black;'>Snap, Upload, and Watch Your Forms Fill Themselves!</h3>", unsafe_allow_html=True)
+        st.markdown("""
+        <p style='text-align: center; color: gray;'>
+            Say goodbye to tedious form filling! With Magic Fill-Out, simply upload a photo of your credentials, and let our smart tool do the rest. 
+            In seconds, all your information is seamlessly entered into the form fields, saving you time and hassle. 
+            It's like magic—just faster!
+        </p>
+        """, unsafe_allow_html=True)
+        st.divider()
         col1, col2 = st.columns(2)
         with col1:
             id_upload = st.file_uploader("Upload Government Valid ID here", type=["jpg", "jpeg", "png"])
@@ -372,9 +392,6 @@ def eligibility_checker_form():
 
         with col3:
             if st.button("Next", use_container_width=True, type="primary"):
-                if not consent:
-                    st.error("Please consent to the above before proceeding.")
-                else:
                     st.session_state.show_form = True
                     st.rerun()
         with col1:
@@ -697,7 +714,7 @@ def homepage():
         st.session_state.home = True
 
     if st.session_state.home:
-        st.markdown("<h1 style='text-align: center; color: black;'>Welcome to BPI Ka-Negosyo Loans</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center; color: #AC0D19;'>Welcome to BPI Ka-Negosyo Loans</h1>", unsafe_allow_html=True)
         st.markdown("""
         <p style='text-align: center; color: gray;'>
             We are here to help you grow your business. Whether you are looking to expand your operations, 
@@ -718,11 +735,7 @@ def homepage():
         col1, col2, col3, col4 = st.columns(4)
         with col2:
             if st.button("Eligibility Checker", key="eligibility_checker", use_container_width=True):
-                st.session_state.show_eligibility_checker = True
-                st.session_state.show_loan_application_form = False
-                st.session_state.show_loan_application_results = False
-                st.session_state.home = False
-                st.rerun()
+                dialog()
 
         with col3:
             if st.button("Loan Application Form", key="loan_application_form" , use_container_width=True):
