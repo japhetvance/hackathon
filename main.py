@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 import openai
+from altair import value
 from dotenv import load_dotenv
 from PIL import Image
 from io import BytesIO
@@ -193,8 +194,9 @@ def eligibility_checker_form():
         data = json.load(json_file)
 
     if st.session_state.show_form:
+        st.markdown("<h2 style='text-align: center; color: black;'>BPI SME Loan Eligibility Checker</h2>",
+                    unsafe_allow_html=True)
         with st.form("eligibility_form"):
-            st.write("Please fill in the form below to check your eligibility for a BPI Personal Loan.")
             col1, col2, col3 = st.columns(3)
             with col1:
                 first_name = st.text_input("First Name", value=data.get("First Name", ""))
@@ -401,221 +403,228 @@ def loan_application_form():
 
     if 'show_application_form' not in st.session_state:
         st.session_state.show_application_form = True
-        st.title("Business Loan Application Form")
+        st.markdown("<h2 style='text-align: center; color: black;'>Business Loan Application Form</h2>", unsafe_allow_html=True)
 
     if st.session_state.show_application_form:
-        with st.form("loan_application_form"):
-            col1, col2 = st.columns(2)
-            with col1:
-                loan_type = st.radio("Loan Type", ["New Application", "Renewal", "Additional Loan", "Restructuring"], index=None)
-            with col2:
-                previous_application = st.radio("In case of loan renewal or restructuring, are there any update from the previous application?", ["Yes", "No"], index=None)
-            business_type = st.radio("Business Type", ["Individual", "Sole Proprietorship"], index=None)
-            st.markdown("---")
-            st.markdown("### **A. BORROWER AND BUSINESS INFORMATION**")
-            st.markdown("---")
-            full_name = st.text_input("Name of the Borrower")
-            col1, col2, col3, col4, col5 = st.columns(5)
-            with col1:
-                civil_status = st.radio("Civil Status", ["Single", "Married", "Widowed", "Separated", "Annuled"], index=None)
-            with col2:
-                birth_date = st.date_input("Birth Date", value=None)
-            with col3:
-                place_of_birth = st.text_input("Place of Birth")
-            with col4:
-                citizenship = st.text_input("Citizenship")
-            with col5:
-                sex = st.radio("Sex", ["Male", "Female"] , index=None)
+        col1, col2, col3 = st.columns([1,3,1])
+        with col2:
+            with st.form("loan_application_form"):
+                col1, col2 = st.columns(2)
+                with col1:
+                    loan_type = st.radio("Loan Type", ["New Application", "Renewal", "Additional Loan", "Restructuring"], index=None)
+                with col2:
+                    previous_application = st.radio("In case of loan renewal or restructuring, are there any update from the previous application?", ["Yes", "No"], index=None)
+                business_type = st.radio("Business Type", ["Individual", "Sole Proprietorship"], index=None)
+                st.markdown("---")
+                st.markdown("### **A. BORROWER AND BUSINESS INFORMATION**")
+                st.markdown("---")
+                full_name = st.text_input("Name of the Borrower" , value=f"{data.get('First Name', '')} {data.get('Middle Name', '')} {data.get('Last Name', '')}")
+                col1, col2, col3, col4, col5 = st.columns(5)
+                with col1:
+                    civil_status = st.radio("Civil Status", ["Single", "Married", "Widowed", "Separated", "Annuled"], index=0)
+                with col2:
+                    date_of_birth_str = data.get("Birth Date", "")
+                    if date_of_birth_str:
+                        date_of_birth = datetime.strptime(date_of_birth_str, "%Y-%m-%d")
+                    else:
+                        date_of_birth = None
+                    birth_date = st.date_input("Birth Date", value=date_of_birth)
+                with col3:
+                    place_of_birth = st.text_input("Place of Birth", value=data.get("Place of Birth", ""))
+                with col4:
+                    citizenship = st.text_input("Citizenship", value="Filipino")
+                with col5:
+                    sex = st.radio("Sex", ["Male", "Female"] , index=0)
 
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                spouse_name = st.text_input("Spouse Name")
-            with col2:
-                spouse_birth_date = st.date_input("Spouse Birth Date", value=None)
-            home_address = st.text_input("Home Address")
-            col1, col2, col3 = st.columns([2,1,1])
-            with col1:
-                home_ownership = st.radio("Home Address Ownership", ["Owned (unencumbered)", "Owned (mortgaged)", "Rented", "Living with Relatives"], index=None)
-            with col2:
-                years_of_stay = st.text_input("Years of Stay")
-            with col3:
-                telephone_number = st.text_input("Telephone Number")
-            col1, col2 = st.columns([1, 2])
-            with col1:
-                mobile_number = st.text_input("Mobile Number")
-            with col2:
-                email_address = st.text_input("Email Address")
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                tin = st.text_input("TIN")
-            with col2:
-                philsys_id = st.text_input("PhilSys ID")
-            with col3:
-                other_id = st.text_input("Other Government-Issued ID")
-            mothers_maiden_name = st.text_input("Mother's Maiden Name")
-            col1, col2, col3 = st.columns([3, 1, 1])
-            with col1:
-                business_name = st.text_input("Registered Business Name")
-            with col2:
-                years_of_business = st.text_input("Years in Operation")
-            with col3:
-                num_of_branches = st.text_input("Number of Branches")
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                similar_to_home_address = st.radio("Is the Business Address similar to Home Address?", ["Yes", "No"], index=None)
-                principal_business_address = st.text_input("Principal Business Address")
-            with col2:
-                business_address_ownership = st.radio("Business Address Ownership", ["Owned (unencumbered)", "Owned (mortgaged)", "Rented"], index=None)
-            col1, col2 = st.columns(2)
-            with col1:
-                website = st.text_input("Website/social media page")
-            with col2:
-                indicate_business_has = st.radio("Indicate weather the business has", ["Female Manager", "Female head officer of operations"] , index=None)
-            col1, col2 = st.columns([1,2])
-            with col1:
-                nature_of_business = st.text_input("Nature of Business")
-            with col2:
-                business_activity = st.text_input("Please specify the business activity")
-            st.markdown("---")
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                st.markdown("Business Registration")
-            with col2:
-                st.markdown("Date of Business Registration")
-            with col3:
-                st.markdown("Expiry Date of Registration")
-            with col4:
-                st.markdown("Registration Number")
-            st.markdown("---")
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                dti = st.checkbox("DTI")
-            with col2:
-                dti_date = st.date_input("DTI Date", value=None)
-            with col3:
-                dti_expiry = st.date_input("DTI Expiry", value=None)
-            with col4:
-                dti_reg_num = st.text_input("DTI Reg. Number")
-            st.markdown("---")
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                bir = st.checkbox("BIR")
-            with col2:
-                bir_date = st.date_input("BIR Date", value=None)
-            with col3:
-                bir_expiry = st.date_input("BIR Expiry", value=None)
-            with col4:
-                bir_reg_num = st.text_input("BIR Reg. Number")
-            st.markdown("---")
-            col1, col2 = st.columns(2)
-            with col1:
-                firm_size = st.radio("Firm Size", ["Micro (not more than Php 3M)", "Small (Php 3m to 15M)", "Medium (Php 15M to 100M)"], index=None)
-            with col2:
-                annual_sales_revenue = st.text_input("Annual Sales Revenue")
-                number_of_employees = st.text_input("Number of Employees")
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    spouse_name = st.text_input("Spouse Name")
+                with col2:
+                    spouse_birth_date = st.date_input("Spouse Birth Date", value=None)
+                home_address = st.text_input("Home Address", value=data.get("Taxpayer Address", ""))
+                col1, col2, col3 = st.columns([2,1,1])
+                with col1:
+                    home_ownership = st.radio("Home Address Ownership", ["Owned (unencumbered)", "Owned (mortgaged)", "Rented", "Living with Relatives"], index=2)
+                with col2:
+                    years_of_stay = st.text_input("Years of Stay", value=20)
+                with col3:
+                    telephone_number = st.text_input("Telephone Number", value=data.get("Telephone Number", ""))
+                col1, col2 = st.columns([1, 2])
+                with col1:
+                    mobile_number = st.text_input("Mobile Number", value="09471234567")
+                with col2:
+                    email_address = st.text_input("Email Address", value=data.get("Email", ""))
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    tin = st.text_input("TIN", value=data.get("Taxpayer TIN", ""))
+                with col2:
+                    philsys_id = st.text_input("PhilSys ID")
+                with col3:
+                    other_id = st.text_input("Other Government-Issued ID")
+                mothers_maiden_name = st.text_input("Mother's Maiden Name")
+                col1, col2, col3 = st.columns([3, 1, 1])
+                with col1:
+                    business_name = st.text_input("Registered Business Name")
+                with col2:
+                    years_of_business = st.text_input("Years in Operation")
+                with col3:
+                    num_of_branches = st.text_input("Number of Branches")
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    similar_to_home_address = st.radio("Is the Business Address similar to Home Address?", ["Yes", "No"], index=None)
+                    principal_business_address = st.text_input("Principal Business Address")
+                with col2:
+                    business_address_ownership = st.radio("Business Address Ownership", ["Owned (unencumbered)", "Owned (mortgaged)", "Rented"], index=None)
+                col1, col2 = st.columns(2)
+                with col1:
+                    website = st.text_input("Website/social media page")
+                with col2:
+                    indicate_business_has = st.radio("Indicate weather the business has", ["Female Manager", "Female head officer of operations"] , index=None)
+                col1, col2 = st.columns([1,2])
+                with col1:
+                    nature_of_business = st.text_input("Nature of Business")
+                with col2:
+                    business_activity = st.text_input("Please specify the business activity")
+                st.markdown("---")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.markdown("Business Registration")
+                with col2:
+                    st.markdown("Date of Business Registration")
+                with col3:
+                    st.markdown("Expiry Date of Registration")
+                with col4:
+                    st.markdown("Registration Number")
+                st.markdown("---")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    dti = st.checkbox("DTI")
+                with col2:
+                    dti_date = st.date_input("DTI Date", value=None)
+                with col3:
+                    dti_expiry = st.date_input("DTI Expiry", value=None)
+                with col4:
+                    dti_reg_num = st.text_input("DTI Reg. Number")
+                st.markdown("---")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    bir = st.checkbox("BIR")
+                with col2:
+                    bir_date = st.date_input("BIR Date", value=None)
+                with col3:
+                    bir_expiry = st.date_input("BIR Expiry", value=None)
+                with col4:
+                    bir_reg_num = st.text_input("BIR Reg. Number")
+                st.markdown("---")
+                col1, col2 = st.columns(2)
+                with col1:
+                    firm_size = st.radio("Firm Size", ["Micro (not more than Php 3M)", "Small (Php 3m to 15M)", "Medium (Php 15M to 100M)"], index=None)
+                with col2:
+                    annual_sales_revenue = st.text_input("Annual Sales Revenue")
+                    number_of_employees = st.text_input("Number of Employees")
 
-            st.markdown("---")
-            st.markdown("### **B. LOAN APPLICATION INFORMATION**")
-            st.markdown("---")
+                st.markdown("---")
+                st.markdown("### **B. LOAN APPLICATION INFORMATION**")
+                st.markdown("---")
 
-            col1, col2 = st.columns(2)
-            with col1:
-                loan_amount = st.text_input("Loan Amount")
-            with col2:
-                repayment_frequency = st.radio("Repayment Frequency", ["Weekly", "Monthly", "Quarterly", "Annually", "Lump sum"], index=None)
+                col1, col2 = st.columns(2)
+                with col1:
+                    loan_amount = st.text_input("Loan Amount")
+                with col2:
+                    repayment_frequency = st.radio("Repayment Frequency", ["Weekly", "Monthly", "Quarterly", "Annually", "Lump sum"], index=None)
 
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                loan_facility = st.radio("Loan Facility", ["Credit Line", "Term Loan", "Others"], index=None)
-            with col2:
-                loan_purpose = st.radio("Loan Purpose", ["Working Capital", "Capital to start additional business", "Business expansion", "Acquisition of Trucks/Vehicles/Equipment", "Acquisition of Real Estate", "Construction", "Renovation", "Franchise Financing", "Trade Related Activities", "Loan Takeout"], index=None)
-            with col3:
-                tenor_months = st.text_input("Tenor (Months)")
-            loan_type = st.radio("Loan Type", ["Unsecured Loan", "Secured Loan"], index=None)
-            collateral = st.text_input("If secured, collateral offered:")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    loan_facility = st.radio("Loan Facility", ["Credit Line", "Term Loan", "Others"], index=None)
+                with col2:
+                    loan_purpose = st.radio("Loan Purpose", ["Working Capital", "Capital to start additional business", "Business expansion", "Acquisition of Trucks/Vehicles/Equipment", "Acquisition of Real Estate", "Construction", "Renovation", "Franchise Financing", "Trade Related Activities", "Loan Takeout"], index=None)
+                with col3:
+                    tenor_months = st.text_input("Tenor (Months)")
+                loan_type = st.radio("Loan Type", ["Unsecured Loan", "Secured Loan"], index=None)
+                collateral = st.text_input("If secured, collateral offered:")
 
-            st.markdown("---")
-            st.markdown("### **C. FINANCIAL INFORMATION**")
-            st.markdown("---")
-            source_of_repayment = st.radio("Source of Repayment", ["Revenue", "Asset Sale", "Savings and/or Investment", "Inheritance", "Salary/Allowance", "Others"], index=None)
-            st.markdown("---")
-            st.markdown("**Existing Deposit and E-money Account**")
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                st.markdown("Name of Financial Institution")
-            with col2:
-                st.markdown("Type of Account")
-            with col3:
-                st.markdown("Year Opened")
-            with col4:
-                st.markdown("Type of Account Ownership")
+                st.markdown("---")
+                st.markdown("### **C. FINANCIAL INFORMATION**")
+                st.markdown("---")
+                source_of_repayment = st.radio("Source of Repayment", ["Revenue", "Asset Sale", "Savings and/or Investment", "Inheritance", "Salary/Allowance", "Others"], index=None)
+                st.markdown("---")
+                st.markdown("**Existing Deposit and E-money Account**")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.markdown("Name of Financial Institution")
+                with col2:
+                    st.markdown("Type of Account")
+                with col3:
+                    st.markdown("Year Opened")
+                with col4:
+                    st.markdown("Type of Account Ownership")
 
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                deposit_name = st.text_input("Deposit Name")
-            with col2:
-                deposit_type = st.radio("Deposit Type", ["Savings", "Checking", "E-wallet", "Others"], index=None)
-            with col3:
-                deposit_year_opened = st.text_input("Year Opened")
-            with col4:
-                deposit_ownership = st.radio("Deposit Ownership", ["Personal", "Business/Merchant"], index=None)
-            st.markdown("---")
-            st.markdown("**Existing Loans**")
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.markdown("Name of Financial Institution")
-            with col2:
-                st.markdown("Loan Amount")
-            with col3:
-                st.markdown("Date Granted")
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                loan_name = st.text_input("Loan Name")
-            with col2:
-                existing_loan_amount = st.text_input("Existing Loan Amount")
-            with col3:
-                loan_date_granted = st.date_input("Date Granted", value=None)
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.markdown("Maturity Date")
-            with col2:
-                st.markdown("Outstanding Balance")
-            with col3:
-                st.markdown("Collateral/s Offered")
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                loan_maturity_date = st.date_input("Maturity Date", value=None)
-            with col2:
-                outstanding_balance = st.text_input("Outstanding Balance")
-            with col3:
-                collateral_offered = st.text_input("Collateral Offered")
-            st.markdown("---")
-            st.markdown("**Existing Credit Cards**")
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                st.markdown("Name of Financial Institution")
-            with col2:
-                st.markdown("Credit Limit")
-            with col3:
-                st.markdown("Outstanding Balance")
-            with col4:
-                st.markdown("Type of Ownership")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    deposit_name = st.text_input("Deposit Name")
+                with col2:
+                    deposit_type = st.radio("Deposit Type", ["Savings", "Checking", "E-wallet", "Others"], index=None)
+                with col3:
+                    deposit_year_opened = st.text_input("Year Opened")
+                with col4:
+                    deposit_ownership = st.radio("Deposit Ownership", ["Personal", "Business/Merchant"], index=None)
+                st.markdown("---")
+                st.markdown("**Existing Loans**")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.markdown("Name of Financial Institution")
+                with col2:
+                    st.markdown("Loan Amount")
+                with col3:
+                    st.markdown("Date Granted")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    loan_name = st.text_input("Loan Name")
+                with col2:
+                    existing_loan_amount = st.text_input("Existing Loan Amount")
+                with col3:
+                    loan_date_granted = st.date_input("Date Granted", value=None)
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.markdown("Maturity Date")
+                with col2:
+                    st.markdown("Outstanding Balance")
+                with col3:
+                    st.markdown("Collateral/s Offered")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    loan_maturity_date = st.date_input("Maturity Date", value=None)
+                with col2:
+                    outstanding_balance = st.text_input("Outstanding Balance")
+                with col3:
+                    collateral_offered = st.text_input("Collateral Offered")
+                st.markdown("---")
+                st.markdown("**Existing Credit Cards**")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.markdown("Name of Financial Institution")
+                with col2:
+                    st.markdown("Credit Limit")
+                with col3:
+                    st.markdown("Outstanding Balance")
+                with col4:
+                    st.markdown("Type of Ownership")
 
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                credit_name = st.text_input("Credit Name")
-            with col2:
-                credit_limit = st.text_input("Credit Limit")
-            with col3:
-                credit_outstanding_balance = st.text_input("Card Outstanding Balance")
-            with col4:
-                credit_ownership = st.radio("Credit Ownership", ["Personal", "Business"], index=None)
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    credit_name = st.text_input("Credit Name")
+                with col2:
+                    credit_limit = st.text_input("Credit Limit")
+                with col3:
+                    credit_outstanding_balance = st.text_input("Card Outstanding Balance")
+                with col4:
+                    credit_ownership = st.radio("Credit Ownership", ["Personal", "Business"], index=None)
 
-            submitted = st.form_submit_button("Submit")
-            if submitted:
-                st.session_state.show_application_form = False
-                st.session_state.show_loan_application_results = True
-                st.rerun()
+                submitted = st.form_submit_button("Submit")
+                if submitted:
+                    st.session_state.show_application_form = False
+                    st.session_state.show_loan_application_results = True
+                    st.rerun()
 
 def loan_application_results(loan_type):
     # Main content
