@@ -479,31 +479,31 @@ def loan_application_form():
                 with col1:
                     tin = st.text_input("TIN", value=data.get("Taxpayer TIN", ""))
                 with col2:
-                    philsys_id = st.text_input("PhilSys ID")
+                    philsys_id = st.text_input("PhilSys ID", value="101821186")
                 with col3:
                     other_id = st.text_input("Other Government-Issued ID")
-                mothers_maiden_name = st.text_input("Mother's Maiden Name")
+                mothers_maiden_name = st.text_input("Mother's Maiden Name", value="GHA-GHA BORRES")
                 col1, col2, col3 = st.columns([3, 1, 1])
                 with col1:
-                    business_name = st.text_input("Registered Business Name")
+                    business_name = st.text_input("Registered Business Name", value=data.get("Business Name", ""))
                 with col2:
-                    years_of_business = st.text_input("Years in Operation")
+                    years_of_business = st.text_input("Years in Operation", value="3")
                 with col3:
                     num_of_branches = st.text_input("Number of Branches")
                 col1, col2 = st.columns([3, 1])
                 with col1:
-                    similar_to_home_address = st.radio("Is the Business Address similar to Home Address?", ["Yes", "No"], index=None)
+                    similar_to_home_address = st.radio("Is the Business Address similar to Home Address?", ["Yes", "No"], index=0)
                     principal_business_address = st.text_input("Principal Business Address")
                 with col2:
                     business_address_ownership = st.radio("Business Address Ownership", ["Owned (unencumbered)", "Owned (mortgaged)", "Rented"], index=None)
                 col1, col2 = st.columns(2)
                 with col1:
-                    website = st.text_input("Website/social media page")
+                    website = st.text_input("Website/social media page", value="intelligent-ai.solutions")
                 with col2:
                     indicate_business_has = st.radio("Indicate weather the business has", ["Female Manager", "Female head officer of operations"] , index=None)
                 col1, col2 = st.columns([1,2])
                 with col1:
-                    nature_of_business = st.text_input("Nature of Business")
+                    nature_of_business = st.text_input("Nature of Business", value=data.get("Line of Business", ""))
                 with col2:
                     business_activity = st.text_input("Please specify the business activity")
                 st.markdown("---")
@@ -519,29 +519,29 @@ def loan_application_form():
                 st.markdown("---")
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    dti = st.checkbox("DTI")
+                    dti = st.checkbox("DTI", value=True)
                 with col2:
-                    dti_date = st.date_input("DTI Date", value=None)
+                    dti_date = st.date_input("DTI Date", datetime(2020, 7, 19))
                 with col3:
-                    dti_expiry = st.date_input("DTI Expiry", value=None)
+                    dti_expiry = st.date_input("DTI Expiry", datetime(2025, 7, 19))
                 with col4:
-                    dti_reg_num = st.text_input("DTI Reg. Number")
+                    dti_reg_num = st.text_input("DTI Reg. Number", value="12345678")
                 st.markdown("---")
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    bir = st.checkbox("BIR")
+                    bir = st.checkbox("BIR", value=True)
                 with col2:
-                    bir_date = st.date_input("BIR Date", value=None)
+                    bir_date = st.date_input("BIR Date", datetime(2020, 7, 19))
                 with col3:
-                    bir_expiry = st.date_input("BIR Expiry", value=None)
+                    bir_expiry = st.date_input("BIR Expiry", datetime(2025, 7, 19))
                 with col4:
-                    bir_reg_num = st.text_input("BIR Reg. Number")
+                    bir_reg_num = st.text_input("BIR Reg. Number", value="12345678")
                 st.markdown("---")
                 col1, col2 = st.columns(2)
                 with col1:
                     firm_size = st.radio("Firm Size", ["Micro (not more than Php 3M)", "Small (Php 3m to 15M)", "Medium (Php 15M to 100M)"], index=None)
                 with col2:
-                    annual_sales_revenue = st.text_input("Annual Sales Revenue")
+                    annual_sales_revenue = st.text_input("Annual Sales Revenue", value=data.get("Total Revenue", ""))
                     number_of_employees = st.text_input("Number of Employees")
 
                 st.markdown("---")
@@ -582,13 +582,13 @@ def loan_application_form():
 
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    deposit_name = st.text_input("Deposit Name")
+                    deposit_name = st.text_input("Deposit Name", value=data.get("Bank Name", ""))
                 with col2:
-                    deposit_type = st.radio("Deposit Type", ["Savings", "Checking", "E-wallet", "Others"], index=None)
+                    deposit_type = st.radio("Deposit Type", ["Savings", "Checking", "E-wallet", "Others"], index=1)
                 with col3:
-                    deposit_year_opened = st.text_input("Year Opened")
+                    deposit_year_opened = st.text_input("Year Opened", value="2018")
                 with col4:
-                    deposit_ownership = st.radio("Deposit Ownership", ["Personal", "Business/Merchant"], index=None)
+                    deposit_ownership = st.radio("Deposit Ownership", ["Personal", "Business/Merchant"], index=0)
                 st.markdown("---")
                 st.markdown("**Existing Loans**")
                 col1, col2, col3 = st.columns(3)
@@ -633,13 +633,13 @@ def loan_application_form():
 
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    credit_name = st.text_input("Credit Name")
+                    credit_name = st.text_input("Credit Name", value=data.get("Bank Name", ""))
                 with col2:
-                    credit_limit = st.text_input("Credit Limit")
+                    credit_limit = st.text_input("Credit Limit", value="100000")
                 with col3:
-                    credit_outstanding_balance = st.text_input("Card Outstanding Balance")
+                    credit_outstanding_balance = st.text_input("Card Outstanding Balance", value="50000")
                 with col4:
-                    credit_ownership = st.radio("Credit Ownership", ["Personal", "Business"], index=None)
+                    credit_ownership = st.radio("Credit Ownership", ["Personal", "Business"], index=0)
                 st.divider()
                 col1, col2, col3 = st.columns([1, 4, 1])
                 with col3:
