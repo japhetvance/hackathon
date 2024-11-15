@@ -4,3 +4,13 @@ streamlit
 Pillow
 requests
 python-dotenv
+nltk
+langchain-openai
+langchain
+pinecone
+pinecone-text
+langchain-community
+langchain-core
+uuid
+asyncio
+
