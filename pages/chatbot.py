@@ -95,7 +95,7 @@ def initialize_pinecone_client(api_key, index_name):
 
 def initialize_llm(callback_manager):
     return ChatOpenAI(
-        model="gpt-4o",
+        model="gpt-4-turbo",
         temperature=0,
         streaming=True,
         callback_manager=callback_manager,
