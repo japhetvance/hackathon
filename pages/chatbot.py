@@ -38,8 +38,8 @@ user_avatar_path = Path("../avatar/human.png")
 assistant_avatar_path = Path("../avatar/ai.png")
 
 # Convert images to base64
-user_avatar_base64 = image_to_base64(user_avatar_path)
-assistant_avatar_base64 = image_to_base64(assistant_avatar_path)
+user_avatar_base64 = image_to_base64("../avatar/human.png")
+assistant_avatar_base64 = image_to_base64("../avatar/ai.png")
 
 # CSS for fixed-height scrollable chat area and alignment
 st.markdown("""
