@@ -194,84 +194,95 @@ def eligibility_checker_form():
         data = json.load(json_file)
 
     if st.session_state.show_form:
-        st.markdown("<h2 style='text-align: center; color: black;'>BPI SME Loan Eligibility Checker</h2>",
-                    unsafe_allow_html=True)
-        with st.form("eligibility_form"):
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                first_name = st.text_input("First Name", value=data.get("First Name", ""))
-            with col2:
-                middle_name = st.text_input("Middle Name", value=data.get("Middle Name", ""))
-            with col3:
-                last_name = st.text_input("Last Name", value=data.get("Last Name", ""))
-            email_address = st.text_input("Email Address", value=data.get("Email", ""))
-            province = st.selectbox("Business Address - Province", provinces_names, index=13)
-            city = st.selectbox("Business Address - City", cities_names, index=13)
-            date_of_birth_str = data.get("Birth Date", "")
-            if date_of_birth_str:
-                date_of_birth = datetime.strptime(date_of_birth_str, "%Y-%m-%d")
-            else:
-                date_of_birth = None
-            date_of_birth = st.date_input("Date of Birth", value=date_of_birth)
-            contact_method = st.radio("Preferred Contact Method", ["Landline Number", "Mobile Number"])
-            contact_number = st.text_input("Contact Number", value=data.get("Telephone Number", ""))
-            st.write("---")
-            existing_depositor = st.radio("Are you an existing depositor of BPI?", ["Yes", "No"])
-            how_did_you_find_out = st.text_input("How did you find out about BPI Ka-Negosyo Loans?")
-            st.write("---")
-            nationality = st.radio("What is your Nationality?", ["Filipino", "Permanent Resident", "Non-Resident"], index=0)
-            loan_purpose = st.selectbox("What is the purpose of your loan?",
-                                        ["--none selected--", "Working Capital", "Capital to start additional business",
-                                         "Business expansion", "Acquisition of Trucks/Vehicles/Equipment",
-                                         "Acquisition of Real Estate", "Construction", "Renovation", "Franchise Financing",
-                                         "Trade Related Activities", "Loan Takeout"])
-            loan_amount = st.text_input("How much would you like to loan?")
-            loan_type = st.selectbox("What Ka-Negosyo loan would you like to apply for?",
-                                     ["--none selected--", "Ka-Negosyo Credit Line", "Ka-Negosyo Ready Loan",
-                                      "Ka-Negosyo SME Loan", "Property Acquisition Loan"])
-            st.write("---")
-            business_type = st.radio("Select an option that best represents your business",
-                                     ["Individual", "Sole Proprietorship", "Professional Engaging in Business",
-                                      "One Person Corporation", "Partnership/Corporation"])
-            years_in_business = st.text_input("How many years has your company been in business?")
-            business_industry = st.text_input("What industry does your business belong to?", value=data.get("Line of Business", ""))
-            gross_monthly_income = st.text_input("What is your company's total gross monthly income?", value=data.get("Gross Income", ""))
-            loan_timeline = st.selectbox("How soon would your company require the loan?",
-                                         ["--none selected--", "Within a month", "In 1-3 months", "3-6 months",
-                                          "More than 6 months", "Not yet confirmed"])
-            submitted = st.form_submit_button("Submit")
-            if submitted:
-                if not all([first_name, middle_name, last_name, email_address, province != "--none selected--", city != "--none selected--",
-                            date_of_birth, contact_number, how_did_you_find_out, loan_purpose != "--none selected--",
-                            loan_amount, loan_type != "--none selected--", years_in_business, business_industry,
-                            gross_monthly_income, loan_timeline != "--none selected--"]):
-                    st.error("Please fill in all the fields.")
+        col1, col2, col3 = st.columns([1, 3, 1])
+        with col2:
+            st.markdown("<h2 style='text-align: center; color: black;'>BPI SME Loan Eligibility Checker</h2>",
+                        unsafe_allow_html=True)
+            with st.form("eligibility_form"):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    first_name = st.text_input("First Name", value=data.get("First Name", ""))
+                with col2:
+                    middle_name = st.text_input("Middle Name", value=data.get("Middle Name", ""))
+                with col3:
+                    last_name = st.text_input("Last Name", value=data.get("Last Name", ""))
+                email_address = st.text_input("Email Address", value=data.get("Email", ""))
+                province = st.selectbox("Business Address - Province", provinces_names, index=13)
+                city = st.selectbox("Business Address - City", cities_names, index=13)
+                date_of_birth_str = data.get("Birth Date", "")
+                if date_of_birth_str:
+                    date_of_birth = datetime.strptime(date_of_birth_str, "%Y-%m-%d")
                 else:
-                    st.success("Form submitted successfully!")
-                    st.session_state.form_data = {
-                        "first_name": first_name,
-                        "middle_name": middle_name,
-                        "last_name": last_name,
-                        "email_address": email_address,
-                        "province": province,
-                        "city": city,
-                        "date_of_birth": date_of_birth,
-                        "contact_method": contact_method,
-                        "contact_number": contact_number,
-                        "existing_depositor": existing_depositor,
-                        "how_did_you_find_out": how_did_you_find_out,
-                        "nationality": nationality,
-                        "loan_purpose": loan_purpose,
-                        "loan_amount": loan_amount,
-                        "loan_type": loan_type,
-                        "business_type": business_type,
-                        "years_in_business": years_in_business,
-                        "business_industry": business_industry,
-                        "gross_monthly_income": gross_monthly_income,
-                        "loan_timeline": loan_timeline
-                    }
+                    date_of_birth = None
+                date_of_birth = st.date_input("Date of Birth", value=date_of_birth)
+                contact_method = st.radio("Preferred Contact Method", ["Landline Number", "Mobile Number"])
+                contact_number = st.text_input("Contact Number", value=data.get("Telephone Number", ""))
+                st.write("---")
+                existing_depositor = st.radio("Are you an existing depositor of BPI?", ["Yes", "No"])
+                how_did_you_find_out = st.text_input("How did you find out about BPI Ka-Negosyo Loans?")
+                st.write("---")
+                nationality = st.radio("What is your Nationality?", ["Filipino", "Permanent Resident", "Non-Resident"], index=0)
+                loan_purpose = st.selectbox("What is the purpose of your loan?",
+                                            ["--none selected--", "Working Capital", "Capital to start additional business",
+                                             "Business expansion", "Acquisition of Trucks/Vehicles/Equipment",
+                                             "Acquisition of Real Estate", "Construction", "Renovation", "Franchise Financing",
+                                             "Trade Related Activities", "Loan Takeout"])
+                loan_amount = st.text_input("How much would you like to loan?")
+                loan_type = st.selectbox("What Ka-Negosyo loan would you like to apply for?",
+                                         ["--none selected--", "Ka-Negosyo Credit Line", "Ka-Negosyo Ready Loan",
+                                          "Ka-Negosyo SME Loan", "Property Acquisition Loan"])
+                st.write("---")
+                business_type = st.radio("Select an option that best represents your business",
+                                         ["Individual", "Sole Proprietorship", "Professional Engaging in Business",
+                                          "One Person Corporation", "Partnership/Corporation"])
+                years_in_business = st.text_input("How many years has your company been in business?")
+                business_industry = st.text_input("What industry does your business belong to?", value=data.get("Line of Business", ""))
+                gross_monthly_income = st.text_input("What is your company's total gross monthly income?", value=data.get("Gross Income", ""))
+                loan_timeline = st.selectbox("How soon would your company require the loan?",
+                                             ["--none selected--", "Within a month", "In 1-3 months", "3-6 months",
+                                              "More than 6 months", "Not yet confirmed"])
+                st.divider()
+                col1, col2, col3 = st.columns([1,4,1])
+                with col3:
+                    submitted = st.form_submit_button("Submit", use_container_width=True, type="primary")
+                with col1:
+                    cancel = st.form_submit_button("Cancel", use_container_width=True, type="secondary")
+                if submitted:
+                    if not all([first_name, middle_name, last_name, email_address, province != "--none selected--", city != "--none selected--",
+                                date_of_birth, contact_number, how_did_you_find_out, loan_purpose != "--none selected--",
+                                loan_amount, loan_type != "--none selected--", years_in_business, business_industry,
+                                gross_monthly_income, loan_timeline != "--none selected--"]):
+                        st.error("Please fill in all the fields.")
+                    else:
+                        st.success("Form submitted successfully!")
+                        st.session_state.form_data = {
+                            "first_name": first_name,
+                            "middle_name": middle_name,
+                            "last_name": last_name,
+                            "email_address": email_address,
+                            "province": province,
+                            "city": city,
+                            "date_of_birth": date_of_birth,
+                            "contact_method": contact_method,
+                            "contact_number": contact_number,
+                            "existing_depositor": existing_depositor,
+                            "how_did_you_find_out": how_did_you_find_out,
+                            "nationality": nationality,
+                            "loan_purpose": loan_purpose,
+                            "loan_amount": loan_amount,
+                            "loan_type": loan_type,
+                            "business_type": business_type,
+                            "years_in_business": years_in_business,
+                            "business_industry": business_industry,
+                            "gross_monthly_income": gross_monthly_income,
+                            "loan_timeline": loan_timeline
+                        }
+                        st.session_state.show_form = False
+                        st.session_state.show_eligibility_result = True
+                        st.rerun()
+
+                if cancel:
                     st.session_state.show_form = False
-                    st.session_state.show_eligibility_result = True
                     st.rerun()
 
     elif st.session_state.show_eligibility_result:
@@ -355,11 +366,21 @@ def eligibility_checker_form():
             with open('extracted_data.json', 'w') as json_file:
                 json.dump(data, json_file, indent=4)
 
-        if st.button("Next"):
-            if not consent:
-                st.error("Please consent to the above before proceeding.")
-            else:
-                st.session_state.show_form = True
+        st.divider()
+
+        col1, col2, col3 = st.columns([1, 5, 1])
+
+        with col3:
+            if st.button("Next", use_container_width=True, type="primary"):
+                if not consent:
+                    st.error("Please consent to the above before proceeding.")
+                else:
+                    st.session_state.show_form = True
+                    st.rerun()
+        with col1:
+            if st.button("Back", use_container_width=True, type="secondary"):
+                st.session_state.home = True
+                st.session_state.show_eligibility_checker = False
                 st.rerun()
 
 def eligibility_results():
@@ -406,7 +427,7 @@ def loan_application_form():
         st.markdown("<h2 style='text-align: center; color: black;'>Business Loan Application Form</h2>", unsafe_allow_html=True)
 
     if st.session_state.show_application_form:
-        col1, col2, col3 = st.columns([1,3,1])
+        col1, col2, col3 = st.columns([1,4,1])
         with col2:
             with st.form("loan_application_form"):
                 col1, col2 = st.columns(2)
@@ -619,11 +640,19 @@ def loan_application_form():
                     credit_outstanding_balance = st.text_input("Card Outstanding Balance")
                 with col4:
                     credit_ownership = st.radio("Credit Ownership", ["Personal", "Business"], index=None)
-
-                submitted = st.form_submit_button("Submit")
+                st.divider()
+                col1, col2, col3 = st.columns([1, 4, 1])
+                with col3:
+                    submitted = st.form_submit_button("Submit", use_container_width=True, type="primary")
+                with col1:
+                    cancel = st.form_submit_button("Cancel", use_container_width=True, type="secondary")
                 if submitted:
                     st.session_state.show_application_form = False
                     st.session_state.show_loan_application_results = True
+                    st.rerun()
+                if cancel:
+                    st.session_state.show_application_form = False
+                    st.session_state.home = True
                     st.rerun()
 
 def loan_application_results(loan_type):
@@ -645,7 +674,7 @@ def loan_application_results(loan_type):
         if st.button("Return Home", use_container_width=True):
             st.session_state.show_loan_application_form = False
             st.session_state.show_loan_application_results = False
-            st.session_state.button_clicked = False
+            st.session_state.home = True
             st.rerun()
 
     # Additional contact information
